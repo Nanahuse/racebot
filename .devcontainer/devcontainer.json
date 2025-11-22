@@ -1,0 +1,26 @@
+{
+    "name": "Debian Python DevContainer (uv)",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "postCreateCommand": "uv sync && cp /tmp/host-gitconfig ~/.gitconfig 2>/dev/null || true && mkdir -p ~/.ssh && cp -r /tmp/host-ssh/* ~/.ssh/ && chmod 700 ~/.ssh && chmod 600 ~/.ssh/* || true",
+    "remoteUser": "vscode",
+    "workspaceFolder": "/workspace",
+    "mounts": [
+        "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+        "source=${localEnv:USERPROFILE}/.gitconfig,target=/tmp/host-gitconfig,type=bind,consistency=cached",
+        "source=${localEnv:USERPROFILE}/.ssh,target=/tmp/host-ssh,type=bind,consistency=cached"
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "charliermarsh.ruff",
+                "astral-sh.ty"
+            ],
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash"
+            }
+        }
+    }
+}
