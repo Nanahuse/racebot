@@ -1,0 +1,1 @@
+「countdown.mp3」は「VOICEVOX:春日部つむぎ」を使用して作成されています
