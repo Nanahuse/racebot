@@ -1,6 +1,10 @@
 # ==== base image ====
 FROM ghcr.io/astral-sh/uv:debian-slim AS base
 ENV UV_LINK_MODE=copy
+ENV UV_CACHE_DIR=/workspace/.uv_cache/cache
+ENV UV_PYTHON_CACHE_DIR=/workspace/.uv_cache/python-cache
+
+WORKDIR /workspace
 
 LABEL org.opencontainers.image.title="racebot" \
     org.opencontainers.image.description="A Discord race countdown bot" \
@@ -15,20 +19,26 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # ==== runtime image ====
 FROM base AS runtime
 
+RUN useradd -m vscode
+RUN chown -R vscode:vscode /workspace
+
+USER vscode
+
+# Setup uv
 COPY pyproject.toml ./
 COPY uv.lock ./
 RUN uv sync
 
-COPY sound ./
-COPY src ./
-CMD ["uv","run", "src/main.py"]
+# Copy application files
+COPY sound ./sound
+COPY src ./src
+
+CMD ["uv", "run", "src/main.py"]
 
 # ==== dev image ====
 FROM base AS dev
 
-ENV UV_CACHE_DIR=/workspace/.uv_cache/cache
-ENV UV_PYTHON_CACHE_DIR=/workspace/.uv_cache/python-cache
-
+# Install dev tools
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git curl openssh-client \
     && rm -rf /var/lib/apt/lists/*
