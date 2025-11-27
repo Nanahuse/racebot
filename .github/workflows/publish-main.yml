@@ -27,7 +27,6 @@ jobs:
           done
           TAG="${DATE}_$n"
           echo "TAG=$TAG" >> $GITHUB_ENV
-          echo "::set-output name=TAG::$TAG"
           echo "Tag to use: $TAG"
 
           

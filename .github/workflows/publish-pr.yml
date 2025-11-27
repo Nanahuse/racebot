@@ -1,0 +1,40 @@
+name: Build and Push Runtime Image (PR)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build-and-push-pr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Set repo owner lowercase
+        id: repo
+        run: echo "OWNER=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set PR tag
+        run: |
+          TAG=pr-${{ github.event.pull_request.number }}-${{ github.sha }}
+          echo "TAG=$TAG" >> $GITHUB_ENV
+
+      - name: Build runtime image
+        run: |
+          docker build --target runtime -t ghcr.io/${OWNER}/experimental-racebot:${TAG} .
+
+      - name: Push runtime image (PR tag)
+        run: |
+          docker push ghcr.io/${OWNER}/experimental-racebot:${TAG}
