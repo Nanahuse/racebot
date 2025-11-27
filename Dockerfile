@@ -8,13 +8,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # ==== runtime image ====
 FROM base AS runtime
-COPY . /workspace
-WORKDIR /workspace
+
+COPY pyproject.toml ./
+COPY uv.lock ./
+RUN uv sync
+
+COPY sound ./
+COPY src ./
 CMD ["uv","run", "src/main.py"]
 
 # ==== dev image ====
 FROM base AS dev
-WORKDIR /workspace
+
+ENV UV_CACHE_DIR=/workspace/.uv_cache/cache
+ENV UV_PYTHON_CACHE_DIR=/workspace/.uv_cache/python-cache
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git curl openssh-client \
     && rm -rf /var/lib/apt/lists/*
