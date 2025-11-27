@@ -19,13 +19,13 @@ jobs:
       - name: Get date tag with increment
         id: datetag
         run: |
-          DATE=$(date +'%Y-%m-%d')
+          DATE=$(date +'%Y%m%d')
           REPO=ghcr.io/${OWNER}/racebot
           n=0
-          while docker manifest inspect "$REPO:$DATE"_$n > /dev/null 2>&1; do
+          while docker manifest inspect "$REPO:$DATE".$n > /dev/null 2>&1; do
             n=$((n+1))
           done
-          TAG="${DATE}_$n"
+          TAG="${DATE}.$n"
           echo "TAG=$TAG" >> $GITHUB_ENV
           echo "Tag to use: $TAG"
 
