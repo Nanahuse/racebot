@@ -2,6 +2,12 @@
 FROM ghcr.io/astral-sh/uv:debian-slim AS base
 ENV UV_LINK_MODE=copy
 
+LABEL org.opencontainers.image.title="racebot" \
+    org.opencontainers.image.description="A Discord race countdown bot" \
+    org.opencontainers.image.url="https://github.com/Nanahuse/racebot" \
+    org.opencontainers.image.source="https://github.com/Nanahuse/racebot" \
+    org.opencontainers.image.licenses="GPLv3"
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg ca-certificates \
     && rm -rf /var/lib/apt/lists/*
