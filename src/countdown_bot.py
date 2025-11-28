@@ -88,7 +88,8 @@ async def vrc(ctx: commands.Context) -> None:
                 await asyncio.sleep(2)
 
             finally:
-                await vc.disconnect()
+                if vc is not None and vc.is_connected():
+                    await vc.disconnect()
 
     await logger.command_log(bot, ctx, "vrc", "finish")
 
