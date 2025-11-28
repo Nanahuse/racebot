@@ -1,14 +1,15 @@
 {
     "name": "Debian Python DevContainer (uv)",
     "build": {
-        "dockerfile": "Dockerfile"
+        "dockerfile": "../Dockerfile",
+        "target": "dev"
     },
-    "postCreateCommand": "uv sync && cp /tmp/host-gitconfig ~/.gitconfig 2>/dev/null || true && mkdir -p ~/.ssh && cp -r /tmp/host-ssh/* ~/.ssh/ && chmod 700 ~/.ssh && chmod 600 ~/.ssh/* || true",
+    "postCreateCommand": "bash .devcontainer/scripts/copy_auth.sh && uv sync",
     "remoteUser": "vscode",
     "workspaceFolder": "/workspace",
     "mounts": [
         "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
-        "source=${localEnv:USERPROFILE}/.gitconfig,target=/tmp/host-gitconfig,type=bind,consistency=cached",
+        "source=${localEnv:USERPROFILE}/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached",
         "source=${localEnv:USERPROFILE}/.ssh,target=/tmp/host-ssh,type=bind,consistency=cached"
     ],
     "customizations": {
