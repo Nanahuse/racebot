@@ -16,7 +16,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# ==== runtime image ====
+# ===================================
+# ========== runtime image ==========
+# ===================================
 FROM base AS runtime
 
 RUN useradd -m appuser
@@ -35,7 +37,9 @@ COPY src ./src
 
 CMD ["uv", "run", "src/main.py"]
 
-# ==== dev image ====
+# ===============================
+# ========== dev image ==========
+# ===============================
 FROM base AS dev
 
 # Install dev tools

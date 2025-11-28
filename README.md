@@ -21,6 +21,7 @@ services:
       # optional settings
       - LOG_CHANNEL_ID=channel_to_send_working_log
       - ERROR_LOG_CHANNEL_ID=channel_to_send_error_log
+      - COUNTDOWN_SOURCE=/workspace/sound/countdown_tsumugi.mp3
     networks:
       - dockge_default
     dns:
@@ -31,3 +32,9 @@ networks:
     external: true
 
 ```
+
+# LICENSE
+コード部分についてはGNU GENERAL PUBLIC LICENSE version 3が適用されます。
+
+`/sound`内にあるカウントダウン音声の作成には「VOICEVOX:春日部つむぎ」、「CeVIO:さとうささら」を使用しております。
+それぞれのライセンスをご確認ください。

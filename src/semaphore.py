@@ -1,9 +1,9 @@
 import contextlib
-from typing import Generator
+from collections.abc import Generator
 
 
 class Semaphore:
-    def __init__(self):
+    def __init__(self) -> None:
         self._semaphores: set[int] = set()
 
     @contextlib.contextmanager

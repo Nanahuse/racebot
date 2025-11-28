@@ -10,7 +10,7 @@ class LogHandler:
         self.log_channel_id = load_log_channel_id()
         self.error_log_channel_id = load_error_log_channel_id()
 
-        self._message_template = Template("$tag@$guild_name#$channel_name: $message")
+        self._message_template = Template("$tag: $message ($author_name@$guild_name#$channel_name)")
 
     async def log(self, bot: commands.Bot, message: str) -> None:
         await self._send(bot, self.log_channel_id, message)
@@ -18,24 +18,11 @@ class LogHandler:
     async def error(self, bot: commands.Bot, message: str) -> None:
         await self._send(bot, self.error_log_channel_id, message)
 
-    async def command_log(
-        self, bot: commands.Bot, ctx: commands.Context, tag: str, message: str
-    ) -> None:
+    async def command_log(self, bot: commands.Bot, ctx: commands.Context, tag: str, message: str) -> None:
         await self._command_message_send(bot, ctx, self.log_channel_id, tag, message)
 
-    async def command_error(
-        self, bot: commands.Bot, ctx: commands.Context, tag: str, message: str
-    ) -> None:
-        await self._command_message_send(
-            bot, ctx, self.error_log_channel_id, tag, message
-        )
-
-    def _get_channel_info(self, ctx: commands.Context) -> tuple[str, str]:
-        guild_name = ctx.guild.name if ctx.guild else "???"
-
-        channel = ctx.channel.name if isinstance(ctx.channel.name, str) else "???"
-
-        return guild_name, channel
+    async def command_error(self, bot: commands.Bot, ctx: commands.Context, tag: str, message: str) -> None:
+        await self._command_message_send(bot, ctx, self.error_log_channel_id, tag, message)
 
     async def _send(
         self,
@@ -64,7 +51,9 @@ class LogHandler:
         if channel_id is None:
             return
 
-        guild_name, channel_name = self._get_channel_info(ctx)
+        guild_name = ctx.guild.name if ctx.guild else "???"
+        channel_name = ctx.channel.name if isinstance(ctx.channel.name, str) else "???"
+        author_name = ctx.author.name
 
         await self._send(
             bot,
@@ -73,6 +62,7 @@ class LogHandler:
                 tag=tag,
                 guild_name=guild_name,
                 channel_name=channel_name,
+                author_name=author_name,
                 message=message,
             ),
         )
