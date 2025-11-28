@@ -1,7 +1,7 @@
 [project]
-name = "workspace"
-version = "0.1.0"
-description = "Add your description here"
+name = "racebot"
+version = "0.0.0"
+description = "Dicord countdown bot"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [

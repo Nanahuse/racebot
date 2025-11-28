@@ -1,5 +1,3 @@
-from time import sleep
-
 import load_env
 from countdown_bot import bot
 
@@ -9,12 +7,7 @@ def main() -> None:
 
     print("Starting bot...")
 
-    while True:
-        try:
-            bot.run(token)
-        except Exception as e:  # noqa: BLE001
-            print(f"Bot crashed: {e}. Restarting in 5 seconds...")
-            sleep(5)
+    bot.run(token, reconnect=True)
 
 
 if __name__ == "__main__":

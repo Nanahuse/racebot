@@ -80,13 +80,10 @@ async def vrc(ctx: commands.Context) -> None:
 
                 await asyncio.sleep(1)
 
-                audio_source = discord.FFmpegPCMAudio(load_countdown_source())
-
-                vc.play(audio_source)
-
-                await countdown(ctx)
-
-                await wait_until_finish_playing(vc)
+                await asyncio.wait_for(
+                    countdown_with_voice(ctx, vc),
+                    timeout=30,
+                )
 
                 await asyncio.sleep(2)
 
@@ -113,6 +110,15 @@ async def countdown(ctx: commands.Context) -> None:
         delayed_send(ctx, 9, "1"),
         delayed_send(ctx, 10, "Go!"),
     )
+
+
+async def countdown_with_voice(ctx: commands.Context, vc: discord.VoiceClient) -> None:
+    audio_source = discord.FFmpegPCMAudio(load_countdown_source())
+
+    vc.play(audio_source)
+
+    await countdown(ctx)
+    await wait_until_finish_playing(vc)
 
 
 async def wait_until_finish_playing(vc: discord.VoiceClient) -> None:
