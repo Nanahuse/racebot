@@ -1,4 +1,6 @@
-# ==== base image ====
+# ================================
+# ========== base image ==========
+# ================================
 FROM ghcr.io/astral-sh/uv:debian-slim AS base
 ENV UV_LINK_MODE=copy
 ENV UV_CACHE_DIR=/workspace/.uv_cache/cache
