@@ -28,3 +28,13 @@ def load_error_log_channel_id() -> int | None:
         return None
 
     return int(result)
+
+
+def load_countdown_source() -> str:
+    result = os.environ.get("COUNTDOWN_SOURCE")
+
+    if result is None:
+        print("Warning: COUNTDOWN_SOURCE is not set in environment variables. Using default value.")
+        return "/workspace/sound/countdown_tsumugi.mp3"
+
+    return result

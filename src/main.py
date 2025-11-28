@@ -6,7 +6,8 @@ def main() -> None:
     token = load_env.load_bot_token()
 
     print("Starting bot...")
-    bot.run(token)
+
+    bot.run(token, reconnect=True)
 
 
 if __name__ == "__main__":

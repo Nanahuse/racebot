@@ -1,4 +1,6 @@
-# ==== base image ====
+# ================================
+# ========== base image ==========
+# ================================
 FROM ghcr.io/astral-sh/uv:debian-slim AS base
 ENV UV_LINK_MODE=copy
 ENV UV_CACHE_DIR=/workspace/.uv_cache/cache
@@ -16,17 +18,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# ==== runtime image ====
+# ===================================
+# ========== runtime image ==========
+# ===================================
 FROM base AS runtime
 
 RUN useradd -m appuser
-RUN chown -R appuser:appuser /workspace
-
-USER appuser
 
 # Setup uv
 COPY pyproject.toml ./
 COPY uv.lock ./
+
+RUN chown -R appuser:appuser /workspace
+
+USER appuser
 RUN uv sync
 
 # Copy application files
@@ -35,7 +40,9 @@ COPY src ./src
 
 CMD ["uv", "run", "src/main.py"]
 
-# ==== dev image ====
+# ===============================
+# ========== dev image ==========
+# ===============================
 FROM base AS dev
 
 # Install dev tools

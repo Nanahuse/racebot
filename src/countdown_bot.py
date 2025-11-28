@@ -3,12 +3,17 @@ import asyncio
 import discord
 from discord.ext import commands
 
+from load_env import load_countdown_source
 from log_handler import LogHandler
 from semaphore import Semaphore
 
 intents = discord.Intents.default()
 intents.message_content = True
-bot = commands.Bot(command_prefix="!", intents=intents)
+bot = commands.Bot(
+    command_prefix="!",
+    intents=intents,
+    description="レース用カウントダウンBot: !rc でテキストカウントダウン、!vrc でボイスカウントダウン",
+)
 
 channel_semaphore = Semaphore()
 logger = LogHandler()
@@ -19,10 +24,10 @@ voice_lock = asyncio.Lock()
 
 @bot.event
 async def on_ready() -> None:
-    await logger.log(bot, f"Wake up as {bot.user}")
+    await logger.log(bot, f"Wake up as {bot.user}")  # noqa: G004
 
 
-@bot.command()
+@bot.command(help="テキストでレースカウントダウンを行います。")
 async def rc(ctx: commands.Context) -> None:
     await logger.command_log(bot, ctx, "rc", "start")
 
@@ -38,7 +43,9 @@ async def rc(ctx: commands.Context) -> None:
         await logger.command_log(bot, ctx, "rc", "finish")
 
 
-@bot.command()
+@bot.command(
+    help="テキストでのカウントと共にボイスチャンネルでカウントダウン音声を再生します。ボイスチャンネル参加必須。"
+)
 async def vrc(ctx: commands.Context) -> None:
     await logger.command_log(bot, ctx, "vrc", "start")
 
@@ -60,30 +67,29 @@ async def vrc(ctx: commands.Context) -> None:
             return
 
         if not is_acquired_voice:
-            await logger.command_log(
-                bot, ctx, "vrc", "cancelled: voice countdown busy."
-            )
+            await logger.command_log(bot, ctx, "vrc", "cancelled: voice countdown busy.")
             return
 
-        await asyncio.sleep(1)
-
         async with voice_lock:
-            if ctx.voice_client is None:
-                vc: discord.VoiceClient = await voice_channel.connect()
-            else:
-                vc: discord.VoiceClient = ctx.voice_client
-                await vc.move_to(voice_channel)
-
             try:
-                audio_source = discord.FFmpegPCMAudio("/workspace/sound/countdown.mp3")
-
-                vc.play(audio_source)
-                await countdown(ctx)
+                if ctx.voice_client is None:
+                    vc: discord.VoiceClient = await voice_channel.connect()
+                else:
+                    vc: discord.VoiceClient = ctx.voice_client
+                    await vc.move_to(voice_channel)
 
                 await asyncio.sleep(1)
 
+                await asyncio.wait_for(
+                    countdown_with_voice(ctx, vc),
+                    timeout=30,
+                )
+
+                await asyncio.sleep(2)
+
             finally:
-                await vc.disconnect()
+                if vc is not None and vc.is_connected():
+                    await vc.disconnect()
 
     await logger.command_log(bot, ctx, "vrc", "finish")
 
@@ -105,3 +111,17 @@ async def countdown(ctx: commands.Context) -> None:
         delayed_send(ctx, 9, "1"),
         delayed_send(ctx, 10, "Go!"),
     )
+
+
+async def countdown_with_voice(ctx: commands.Context, vc: discord.VoiceClient) -> None:
+    audio_source = discord.FFmpegPCMAudio(load_countdown_source())
+
+    vc.play(audio_source)
+
+    await countdown(ctx)
+    await wait_until_finish_playing(vc)
+
+
+async def wait_until_finish_playing(vc: discord.VoiceClient) -> None:
+    while vc.is_playing():  # noqa: ASYNC110
+        await asyncio.sleep(0.1)
