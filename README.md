@@ -8,7 +8,7 @@ Discordでレース用のカウントダウンを行うためのBotです。
 
 
 # docker-compose.yaml sample
-
+## deploy on dockge
 ```yaml
 services:
   main:
@@ -20,7 +20,7 @@ services:
     
       # optional settings
       - LOG_CHANNEL_ID=channel_to_send_working_log
-      - ERROR_LOG_CHANNEL_ID=channel_to_send_error_log 
+      - ERROR_LOG_CHANNEL_ID=channel_to_send_error_log
     networks:
       - dockge_default
     dns:

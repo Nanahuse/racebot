@@ -19,10 +19,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # ==== runtime image ====
 FROM base AS runtime
 
-RUN useradd -m vscode
-RUN chown -R vscode:vscode /workspace
+RUN useradd -m appuser
+RUN chown -R appuser:appuser /workspace
 
-USER vscode
+USER appuser
 
 # Setup uv
 COPY pyproject.toml ./
@@ -40,8 +40,10 @@ FROM base AS dev
 
 # Install dev tools
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git curl openssh-client \
+    git \
+    curl \
+    openssh-client \
     && rm -rf /var/lib/apt/lists/*
 
-RUN useradd -m vscode && usermod -aG sudo vscode
+RUN useradd -m vscode
 USER vscode

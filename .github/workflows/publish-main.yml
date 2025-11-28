@@ -13,11 +13,13 @@ jobs:
 
     steps:
       - name: Set repo owner lowercase
-        id: repo
         run: echo "OWNER=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+
       - name: Get date tag with increment
-        id: datetag
         run: |
           DATE=$(date +'%Y%m%d')
           REPO=ghcr.io/${OWNER}/racebot
@@ -28,11 +30,7 @@ jobs:
           TAG="${DATE}.$n"
           echo "TAG=$TAG" >> $GITHUB_ENV
           echo "Tag to use: $TAG"
-
           
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
