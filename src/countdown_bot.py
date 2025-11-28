@@ -15,7 +15,8 @@ bot = commands.Bot(
     description="レース用カウントダウンBot: !rc でテキストカウントダウン、!vrc でボイスカウントダウン",
 )
 
-channel_semaphore = Semaphore()
+text_channel_semaphore = Semaphore()
+voice_channel_semaphore = Semaphore()
 logger = LogHandler()
 voice_lock = asyncio.Lock()
 
@@ -31,7 +32,7 @@ async def on_ready() -> None:
 async def rc(ctx: commands.Context) -> None:
     await logger.command_log(bot, ctx, "rc", "start")
 
-    with channel_semaphore.acquire(ctx.channel.id) as is_acquired:
+    with text_channel_semaphore.acquire(ctx.channel.id) as is_acquired:
         if not is_acquired:
             await logger.command_log(bot, ctx, "rc", "cancelled: countdown busy.")
             return
@@ -59,8 +60,8 @@ async def vrc(ctx: commands.Context) -> None:
     voice_channel: discord.VoiceChannel = ctx.author.voice.channel
 
     with (
-        channel_semaphore.acquire(ctx.channel.id) as is_acquired,
-        channel_semaphore.acquire(voice_channel.id) as is_acquired_voice,
+        text_channel_semaphore.acquire(ctx.channel.id) as is_acquired,
+        voice_channel_semaphore.acquire(voice_channel.id) as is_acquired_voice,
     ):
         if not is_acquired:
             await logger.command_log(bot, ctx, "vrc", "cancelled: text countdown busy.")
