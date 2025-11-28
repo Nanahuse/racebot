@@ -22,13 +22,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 FROM base AS runtime
 
 RUN useradd -m appuser
-RUN chown -R appuser:appuser /workspace
-
-USER appuser
 
 # Setup uv
 COPY pyproject.toml ./
 COPY uv.lock ./
+
+RUN chown -R appuser:appuser /workspace
+
+USER appuser
 RUN uv sync
 
 # Copy application files
