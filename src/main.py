@@ -1,5 +1,3 @@
-import asyncio
-
 import discord
 from discord.ext import commands
 
@@ -23,11 +21,14 @@ def main() -> None:
         error_log_channel_id=load_env.load_error_log_channel_id(),
     )
 
-    asyncio.run(bot.add_cog(CountdownCog(logger, load_env.load_countdown_source())))
-
     @bot.event
     async def on_ready() -> None:
         await logger.log(f"Wake up as {bot.user}")
+
+    async def setup_hook() -> None:
+        await bot.add_cog(CountdownCog(logger, load_env.load_countdown_source()))
+
+    bot.setup_hook = setup_hook  # type: ignore[assignment]
 
     print("Starting bot...")
     token = load_env.load_bot_token()
