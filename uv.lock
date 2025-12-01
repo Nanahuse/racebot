@@ -481,8 +481,8 @@ wheels = [
 ]
 
 [[package]]
-name = "workspace"
-version = "0.1.0"
+name = "racebot"
+version = "0.0.0"
 source = { virtual = "." }
 dependencies = [
     { name = "discord-py", extra = ["voice"] },
