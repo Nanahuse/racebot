@@ -28,7 +28,7 @@ def main() -> None:
     async def setup_hook() -> None:
         await bot.add_cog(CountdownCog(logger, load_env.load_countdown_source()))
 
-    bot.setup_hook = setup_hook
+    bot.setup_hook = setup_hook  # type: ignore[assignment]
 
     print("Starting bot...")
     token = load_env.load_bot_token()
