@@ -1,11 +1,12 @@
 import os
 
 
-def load_bot_token() -> str:
+def load_bot_token() -> str | None:
     result = os.environ.get("BOT_TOKEN")
 
     if result is None:
-        raise RuntimeError("BOT_TOKEN is not set in environment variables.")
+        print("Error: BOT_TOKEN is not set in environment variables.")
+        return None
 
     return result
 

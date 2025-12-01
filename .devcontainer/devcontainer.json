@@ -20,7 +20,22 @@
                 "astral-sh.ty"
             ],
             "settings": {
-                "terminal.integrated.defaultProfile.linux": "bash"
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "editor.formatOnSave": true,
+                // Ruff settings
+                "ruff.fixAll": true,
+                "ruff.organizeImports": true,
+                "ruff.lint.enable": true,
+                "[python]": {
+                    "editor.defaultFormatter": "charliermarsh.ruff",
+                    "editor.codeActionsOnSave": {
+                        "source.fixAll.ruff": "always",
+                        "source.organizeImports.ruff": "always"
+                    }
+                },
+                // Ty settings
+                "ty.diagnosticMode": "workspace",
+                "ty.inlayHints.variableTypes": false
             }
         }
     }

@@ -26,3 +26,6 @@ lint.ignore = [
     "TD",
 ]
 lint.fixable = ["ALL"]
+
+[tool.ruff.format]
+docstring-code-format = true

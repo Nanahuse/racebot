@@ -1,39 +1,43 @@
 from string import Template
+from typing import TYPE_CHECKING, cast
 
 from discord.ext import commands
 
-from load_env import load_error_log_channel_id, load_log_channel_id
+if TYPE_CHECKING:
+    import discord
 
 
 class LogHandler:
-    def __init__(self) -> None:
-        self.log_channel_id = load_log_channel_id()
-        self.error_log_channel_id = load_error_log_channel_id()
+    def __init__(
+        self, bot: commands.Bot, log_channel_id: int | None = None, error_log_channel_id: int | None = None
+    ) -> None:
+        self.bot = bot
+        self.log_channel_id = log_channel_id
+        self.error_log_channel_id = error_log_channel_id
 
         self._message_template = Template("$tag: $message ($author_name@$guild_name#$channel_name)")
 
-    async def log(self, bot: commands.Bot, message: str) -> None:
-        await self._send(bot, self.log_channel_id, message)
+    async def log(self, message: str) -> None:
+        await self._send(self.log_channel_id, message)
 
-    async def error(self, bot: commands.Bot, message: str) -> None:
-        await self._send(bot, self.error_log_channel_id, message)
+    async def error(self, message: str) -> None:
+        await self._send(self.error_log_channel_id, message)
 
-    async def command_log(self, bot: commands.Bot, ctx: commands.Context, tag: str, message: str) -> None:
-        await self._command_message_send(bot, ctx, self.log_channel_id, tag, message)
+    async def command_log(self, ctx: commands.Context, tag: str, message: str) -> None:
+        await self._command_message_send(ctx, self.log_channel_id, tag, message)
 
-    async def command_error(self, bot: commands.Bot, ctx: commands.Context, tag: str, message: str) -> None:
-        await self._command_message_send(bot, ctx, self.error_log_channel_id, tag, message)
+    async def command_error(self, ctx: commands.Context, tag: str, message: str) -> None:
+        await self._command_message_send(ctx, self.error_log_channel_id, tag, message)
 
     async def _send(
         self,
-        bot: commands.Bot,
         channel_id: int | None,
         message: str,
     ) -> None:
         if channel_id is None:
             return
 
-        channel = bot.get_channel(channel_id)
+        channel = cast("discord.TextChannel", self.bot.get_channel(channel_id))
 
         if channel is None:
             raise RuntimeError(f"Channel not found. ID: {channel_id}")
@@ -42,7 +46,6 @@ class LogHandler:
 
     async def _command_message_send(
         self,
-        bot: commands.Bot,
         ctx: commands.Context,
         channel_id: int | None,
         tag: str,
@@ -56,7 +59,6 @@ class LogHandler:
         author_name = ctx.author.name
 
         await self._send(
-            bot,
             channel_id,
             self._message_template.substitute(
                 tag=tag,
